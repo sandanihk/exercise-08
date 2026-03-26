@@ -1,0 +1,382 @@
+---
+title: "exercise-08.qmd"
+format: html
+author: Sandani Kottegoda
+date: today
+---
+
+## Step 1:
+
+*Use the read_csv() function to load the “Street_et_al_2017.csv” dataset as a “tibble” named d. Generate the five-number summary, (median, minimum and maximum and 1st and 3rd quartile values), plus mean and standard deviation, for each quantitative variable*
+
+To begin the exercise, I load in the {tidyverse} package in order to use `read_csv()`. I then assign the dataset URL as a tibble called "d"; col_names is set to TRUE to ensure the first row are used as column names. I looked through the dataset briefly using `head()`, `names()`, and `str()`.
+
+```{r}
+library(tidyverse) # loading in necessary package
+
+# loading in dataset
+d <- read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/main/Street_et_al_2017.csv", col_names = TRUE)
+
+# getting a quick overview
+head(d)
+names(d)
+str(d) # ensuring its a tibble
+```
+
+To generate a five-number summary, mean, and standard deviation (SD) for each quantitative variable, I loaded in the package {skimr} to use the `skim()`. `skim()` provides a nice overview (as a tibble), which shows the mean, SD, percentile values, and histograms of the distribution.
+```{r}
+library(skimr) # loading in another package
+
+# exploratory analysis using skim()
+skim(d)
+```
+
+## Step 2: 
+
+*Plot brain size (ECV) as a function of social group size (Group_size), longevity (Longevity), juvenile period length (Weaning), and reproductive lifespan (Repro_lifespan).*
+
+To plot ECV as a function of social group size, longevity, juvenile period length, and reproductive lifespan, I used `ggplot()` and `geom_point()` to get a bivariate scatterplot. Each variable was log-transformed to make the data more interpretable and remove the skew that was present in the non-transformed data; it is also necessary to do to meet the assumptions of a regression analysis. `na.rm()` was also used to remove any missing data just in case!
+```{r}
+# plotting ECV vs. social group size (both log-transformed)
+ggplot(data = d, aes(x = log(Group_size), y = log(ECV))) +
+  geom_point(na.rm = TRUE)  # removing any missing values
+
+# plotting ECV vs. longevity (both log-transformed)
+ggplot(data = d, aes(x = log(Longevity), y = log(ECV))) +
+  geom_point(na.rm = TRUE)
+
+# plotting ECV vs. juvenile period length (both log-transformed)
+ggplot(data = d, aes(x = log(Weaning), y = log(ECV))) +
+  geom_point(na.rm = TRUE)
+
+# plotting ECV vs. reproductive lifespan (both log-transformed)
+ggplot(data = d, aes(x = log((Repro_lifespan)), y = log(ECV))) +
+  geom_point(na.rm = TRUE)
+```
+
+## Step 3: 
+
+*Derive by hand the ordinary least squares regression coefficients (beta1 and beta0) for ECV as a function of social group size.*
+
+To calculate the ordinary least squares regression coefficients, I started out by filtering out rows that may be missing values for one of the variables using the pipe operator and conditions statements. The conditional statement ensures that we are filtering rows that do not, not have missing values (by !is.na) for the variables of interest. The output was assigned to a temporary dataset, "temp_d."
+
+I was honestly not 100% on whether to perform the next steps with the log-transformed or raw data. **To me, it makes sense to continue with the log-transformed data so the OLS assumptions aren't violated and for consistency with the previous step.** However, I added both calculations for the raw and log-transformed data just in case.
+
+To calculate beta1, I used the built-in covariance function and divided the covariance of ECV and group size by the variance of the predictor (x) variable, group size; this value was assigned to the object "beta_1." I also did another method that breaks down the covariance and variance equations; this was assigned to "beta1_a." This value ultimately describes the relationship between group size and ECV.
+
+To calculate beta0, I subtracted the product of beta1 and the mean of the predictor variable (group size) from the mean of the response variable (ECV), based on the beta0 equation. This is the value of y (ECV) when x (group size) is 0 (i.e., the y-intercept).
+```{r}
+# calculating OLS regression coefficients for raw data
+
+# removing rows and assigning to temporary dataset
+temp_d <- d |> 
+  filter(!is.na(Group_size) & !is.na(ECV)) 
+
+
+# calculating beta1 by hand
+beta1 <- (cov(temp_d$ECV, temp_d$Group_size))/(var(temp_d$Group_size))
+
+beta1 # calling object
+
+# an alternate way
+beta1_a <- sum((temp_d$ECV - mean(temp_d$ECV)) * (temp_d$Group_size - mean(temp_d$Group_size)))/sum((temp_d$Group_size - mean(temp_d$Group_size))^2)
+
+beta1_a
+
+
+# calculating beta0 by hand
+beta0 <- mean(temp_d$ECV) - beta1 * mean(temp_d$Group_size)
+
+beta0
+```
+
+```{r}
+# calculating OLS regression coefficients for log-transformed data
+
+# calculating beta1 by hand
+log_beta1 <- (cov(log(temp_d$ECV), log(temp_d$Group_size)))/(var(log(temp_d$Group_size)))
+
+log_beta1 # calling object
+
+# an alternate way
+log_beta1_a <- sum((log(temp_d$ECV) - mean(log(temp_d$ECV))) * (log(temp_d$Group_size) - mean(log(temp_d$Group_size))))/sum((log(temp_d$Group_size) - mean(log(temp_d$Group_size)))^2)
+
+log_beta1_a
+
+
+# calculating beta0 by hand
+log_beta0 <- mean(log(temp_d$ECV)) - log_beta1 * mean(log(temp_d$Group_size))
+
+log_beta0
+```
+
+## Step 4:
+
+*Confirm that you get the same results using the lm() function.*
+
+To confirm I got the same results as the by-hand derivations of the OLS regression coefficients, `lm()` was used and the results were visualized using `summary()`. I checked the results for both the raw and log-transformed data.
+
+For both of them, the values were the same!
+```{r}
+# checking with lm() function (raw data)
+m <- lm(ECV ~ Group_size, data = temp_d)
+summary(m) # visual overview of statistical results
+
+
+# checking with lm() function (log-transformed data)
+log_m <- lm(log(ECV) ~ log(Group_size), data = temp_d)
+summary(log_m)
+
+# extracting results
+log_m$coefficients
+```
+
+## Step 5:
+
+*Repeat the analysis above for three different major radiations of primates - “catarrhines”, “platyrrhines”, and “strepsirhines”) separately.*
+
+In order the repeat the analysis for the three major radiations of primates, I filtered the temporary dataset (temp_d) further to generate the regression coefficients for each group separately using `lm()`. This time, I used the log-transformed data only to reduce the amount of code.
+
+I then performed the regression analysis using the `lm()` function for each filtered dataset to generate the regression coefficients. To compare the coefficients, I simply used the "$" operator on the linear modeling objects ("m_[abbreviated name]") for the coeffcients.
+```{r}
+# analysis for catarrhines
+cat <- temp_d |> filter(Taxonomic_group == "Catarrhini") # filtering by taxonomic group
+m_cat <- lm(log(ECV) ~ log(Group_size), data = cat) # regression analysis on log-transformed data
+
+# analysis for platyrrhines
+platy <- temp_d |> filter(Taxonomic_group == "Platyrrhini")
+m_platy <- lm(log(ECV) ~ log(Group_size), data = platy)
+
+# analysis for strepsirhines
+streps <- temp_d |> filter(Taxonomic_group == "Strepsirhini")
+m_streps <- lm(log(ECV) ~ log(Group_size), data = streps)
+
+
+# comparison between regression coefficients
+m_cat$coefficients
+m_platy$coefficients
+m_streps$coefficients
+```
+*Do your regression coefficients differ among groups? How might you determine this?* Response: The regression coefficients of Platyrrhini and Strepsirhini are quite similar. They both show similar positive relationships between group and brain sizes. However, they ar notably differ from Catarrhini. Catarrhini shows a higher intercept but a slightly negative slope, suggesting group size as a poor predictor of ECV.
+
+To determine whether the regression coefficients differ between the groups, I would calculate the standard error for each slope and generate their 95% confidence intervals. If the confidence intervals do not overlap, it would support that the taxonomic groups are significantly different between this relationship.
+
+## Step 6:
+
+*For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, the 95% CI, and the p value associated with this coefficient by hand. Also extract this same information from the results of running the lm() function.*
+
+To calculate the the SEs for the slope coefficient, I start of by calculating the sum of squares of y (SSY), which measures the total variation in the y variable, ECV. Throughout this analysis, I used indices ([[1]] for the response variable, and [[2]] for the predictor variable) according to the log-transformed data structure (log_m$model) for simplicity.
+
+Then, I calculate the regression sum of squares (SSR), which looks at the explained variation and determines how well the model represents the data. The SSE (error sum of squares) was then calculated to determine the unexplained variation in the data. Next, the mean squared error (MSE) was calculated to get the average unexplained variance, which takes the SSE and divides it by the degrees of freedom (n-2. The sum of square of x (SSX) was calculated afterwardm which measures the total variation in the x variable, social group size. SSX is the sum of the squared differences between the species' group size and the average group size for that radiation.
+
+Finally, I calculated the slope coefficient by taking the square root of MSE divided by SSX.
+```{r}
+# linear model of interest
+log_m <- lm(log(ECV) ~ log(Group_size), data = temp_d)
+log_m # calling results
+
+
+# calculating SSY
+SSY <- sum((log_m$model[[1]] - mean(log_m$model[[1]]))^2) # variation in y
+SSY
+
+# calculating SSR
+SSR <- sum((log_m$fitted.values - mean(log_m$model[[1]]))^2)
+SSR
+
+# calculating SSE
+SSE <- sum(log_m$residuals^2)
+SSE
+
+# calculating MSE
+n <- nrow(log_m$model) # number of observations
+df_error <- n - 2 # because we are estimating two parameters (beta1 and beta0)
+MSE <- SSE/df_error # mean remaining variance
+MSE
+
+# calculating SSX
+SSX <- sum((log_m$model[[2]] - mean(log_m$model[[2]]))^2) # variation in x
+SSX
+
+
+# calculating the slope coefficient
+SE_beta1 <- sqrt(MSE/SSX)
+SE_beta1
+```
+
+I calculated the 95% confidence intervals (CIs) by first assigning the critical value with the `qt()` function, with df determined by `df.residual()`; this function takes the number of observations (n) and subtracts the number of parameters estimated (p)--in this case, 2 parameters. 0.975 was used to generate a 95% confidence interval (where 0.975 leaves 2.5% in the tails). I then calculated the lower and upper bounds of the CI using the log-transformed beta1 value, critical value, and the SE of the slope coefficient.
+```{r}
+# calculating 95% confidence interval
+
+df <- df.residual(log_m) # assigning df using df.residual()
+
+# calculating critical t-value
+crit_t <- qt(0.975, df = df) 
+crit_t
+
+# calculating CI bounds
+ci_lower <- log_beta1 - (crit_t * SE_beta1) # lower bound
+ci_lower
+
+ci_upper <- log_beta1 + (crit_t * SE_beta1) # upper bound
+ci_upper
+
+# results
+c(ci_lower, ci_upper)
+```
+
+To calculate the p-value, I determined the t-statistic, which is the slope coefficient divided by the SE of the slope coefficient. The `pt()` function was then used to find the area in the lower tail that correspond to the absolute value of the t-statistic. This was multiple by two to account for both tails. This ultimately represents the probability of obtaining an extreme coefficient as the one observed, asumming social group size has no effect on ECV.
+```{r}
+# calculating t-statistic
+t_stat <- (log_beta1)/(SE_beta1)
+t_stat
+
+# calculating p-value
+p_value_manual <- 2 * pt(-abs(t_stat), df = df)
+p_value_manual
+
+```
+
+To confirm that the same results are obtained with the `lm()` function, I first loaded in the required {broom} package. I then used the `tidy()` function to make a clean, readable table of the key statistics of the linear model, "log_m." The SE, 95% CI, and p-values were extracted from the tidy data frame for comparison to the values calculated by hand. I used "[]" extraction to easily extract data pertaining to the slope (beta1), which is of interest; the values are in the second row, which is why I used "[2]."
+```{r}
+# loading in package for tidy()
+library(broom)
+
+# checking with lm() function (log-transformed data)
+
+# creating tidy summary for linear model
+s <- tidy(log_m, conf.int = TRUE, conf.level = 0.95)
+s
+
+# extracting SE
+se_tidy <- s$std.error[2]
+se_tidy
+
+# extracting 95% CI
+ci_tidy_lower <- s$conf.low[2]
+ci_tidy_lower
+
+ci_tidy_upper<- s$conf.high[2]
+ci_tidy_upper
+
+# extracting p-value
+p_value_tidy <- s$p.value[2]
+p_value_tidy
+```
+
+## Step 7:
+
+*Use a permutation approach with 1000 permutations to generate a null sampling distribution for the slope coefficient. What is it that you need to permute? What is the p value associated with your original slope coefficient? You can use either the quantile method or a theory-based method sampling distribution as the estimate of the standard error, or both, to calculate this p value.*
+
+For our current linear model, I need to permute the predictor variable, social group size, while keeping the response variable, ECV, the same. 
+
+To begin the permutation approach, I first generate an object called "observed_coef," which pulls out the specific slope coefficient from the tidy table to represent the actual slope. The permutation appraoch is then set up by defining the number of permutations (1000) and creating an empty vector that will contain the 1000 different slope coefficients generated from this simulation. A permutation for loop is created, where a temporary copy of the dataset is made for each round, the social group sizes are shuffled (by `sample()`) (while ECV remains the same), and a new linear regression analysis is performed on the shuffled data for every loop iteration.
+
+Lastly, I visualize the null distribution using a histogram. This allows me to see how far away the observed coefficient--0.708--sits from the null sampling distribution. Since it is far away from the center, it supports that we have statistically determined that the relationship between ECV and social group size may not be due to chance.
+```{r}
+# extracting the observed slope coefficient
+observed_coef <- tidy(log_m) |> # creating a tidy table
+  filter(term == "log(Group_size)") |> # filtering group size
+  pull(estimate) # pulling result
+
+observed_coef
+
+# setting up permutation loop
+nperm <- 1000 # number of permutations
+perm_coefs <- vector(length = nperm) # creating a vector of results
+
+for(i in 1:nperm) {
+    d_perm <- temp_d # creating a copy of data frame to shuffle values
+    d_perm$log_group <- sample(log(temp_d$Group_size))  # shuffling predictor values
+    
+    # running model on shuffled data and pulling the slope
+    perm_coefs[[i]] <- lm(log(ECV) ~ log_group, data = d_perm) |> 
+      tidy() |> 
+      filter(term == "log_group") |> 
+      pull(estimate)
+}
+
+# visualizing distribution
+hist(perm_coefs)
+```
+
+To calculate the p-value associated with the original slope coefficeint, I calculated the value using the quantile and theory-based methods. For the quantile method, I created a vector of TRUE and FALSE values and took the mean to get a proportion from the permutations. For the theory-based approach, I first determined the standard deviation of the sample distribution to get the SE. I then calculated a t-statistic based on the permuted SE and calculated the p-value similar to the previous step.
+
+Based on the quantile method, I got a p-value of 0, indicating that none of the 1000 permutations produced a slope as extreme as the observed coefficient. The theory-based method, which uses the permutation distribution to parameterize a t-distribution, resulted a very small p-value (e-15). 
+```{r}
+# calculating quantile-based p-value
+p_value_quantile <- mean(abs(perm_coefs) >= abs(observed_coef))
+cat("Quantile-based p-value:", p_value_quantile) # showing results
+
+
+# calculating theory-based p-value
+
+# estimating SE from the permutation distribution 
+se_perm <- sd(perm_coefs)
+
+# calculating t-statistic using this new SE
+t_stat_theory <- (observed_coef)/(se_perm)
+
+# calculating p-value using  t-distribution
+df <- df.residual(log_m) # using df.residual() to get the correct degrees of freedom
+p_value_theory <- 2 * pt(-abs(t_stat_theory), df = df) # calculating p-value
+
+cat("Theory-based p-value:", p_value_theory)
+```
+
+## Step 8:
+
+*Use bootstrapping to generate a 95% CI for your estimate of the slope coefficient using both the quantile method and the theory-based method.*
+
+To generate a 95% CI using bootstrapping, I first defined the number of samples to be 1000 and generated a empty vector to store the results from the loop. A for loop for bootstrapping was made to resample the data with replacement. For each of the resamples, a regression was run and the slope was pulled and stored into the vector that was made (boot_coef).
+
+Then, I visualized the distribution using the `hist()` function, which should be centered near the observed slope if the original results was stable. `quantile()` was used to determine an empirical confidence interval, cutting off the top and bottom 2.5%, for the quantile method of determine the 95% CI. 
+
+To determine the theory-based CI, I first calculated the empirical estimate of the SE, which is the standard deviation of the 1000 bootstrap replicates  The observed slope from the original model was then pulled, the degrees of freedom were determined, and the critical value was estimated for a 95% CI. Lastly, the upper and lower CI bounds were calculated by multiplying the critical value by the SE and adding/subtracting from the observed slope.
+```{r}
+# estimating the CI using bootstrapping
+
+nboot <- 1000 # defining number of samples
+boot_coef <- (vector = nboot) # creating a vector to store results from loop
+
+# bootstrapping loop
+for(i in 1:nboot){ 
+  d_boot <- temp_d[sample(nrow(temp_d), replace = TRUE), ]  # sampling rows with replacement
+  # running model on bootstrapped sample and pulling slope
+  boot_coef[[i]] <- lm(log(ECV) ~ log(Group_size), data = d_boot) |> 
+    tidy() |> 
+    filter(term == "log(Group_size)") |> 
+    pull(estimate)
+}
+
+# visualizing distribution (should be centered on observed slope)
+hist(boot_coef)
+
+
+
+# calculating 95% CI using quantile function
+ci_quantile <- quantile(boot_coef, c(0.025, 0.975)) 
+ci_quantile
+
+
+# calculating theory-based 95% CI
+boot_se <- sd(boot_coef) # calculating SE
+
+# determining observed slope
+obs_slope <- tidy(log_m) |> 
+  filter(term == "log(Group_size)") |> 
+  pull(estimate)
+
+# calculating critical value
+df <- df.residual(log_m) # defining df
+t_crit <- qt(0.975, df = df) 
+
+# calculating low and upper bounds
+boot_low  <- obs_slope - (t_crit * boot_se) # lower bound
+boot_high <- obs_slope + (t_crit * boot_se) # upper bound
+
+# results
+cat("Theory-Based Bootstrap 95% CI: [", boot_low, ",", boot_high, "]\n")
+  
+```
+*Do these CIs suggest that your slope coefficient is different from zero?* The quantile and theory-based confidence intervals suggest that the slope coefficient is significantly different from 0, as they both exclude 0. Since the range of the confidence intervals are positive, we can conclude with 95% confidence that the relationship between social group size and ECV is significantly different from 0, and we can reject the null hypothesis. If the CIs included 0, we would not be able to reject the null hypothesis and would suggest that the difference between the predictor and response variables are not significantly different.
