@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sandani Kottegoda">
-<meta name="dcterms.date" content="2026-03-26">
+<meta name="dcterms.date" content="2026-03-28">
 
 <title>exercise-08.qmd</title>
 <style>
@@ -98,7 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 26, 2026</p>
+      <p class="date">March 28, 2026</p>
     </div>
   </div>
   
@@ -113,7 +113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1" class="level2">
 <h2 class="anchored" data-anchor-id="step-1">Step 1:</h2>
 <p><em>Use the read_csv() function to load the “Street_et_al_2017.csv” dataset as a “tibble” named d.&nbsp;Generate the five-number summary, (median, minimum and maximum and 1st and 3rd quartile values), plus mean and standard deviation, for each quantitative variable</em></p>
-<p>To begin the exercise, I load in the {tidyverse} package in order to use <code>read_csv()</code>. I then assign the dataset URL as a tibble called “d”; col_names is set to TRUE to ensure the first row are used as column names. I looked through the dataset briefly using <code>head()</code>, <code>names()</code>, and <code>str()</code>.</p>
+<p>To begin the exercise, I loaded in the {tidyverse} package to use <code>read_csv()</code>. I assigned the dataset URL as a tibble called “d”; col_names is set to TRUE to ensure the first row is used for column names. I then looked through the dataset briefly using <code>head()</code>, <code>names()</code>, and <code>str()</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># loading in necessary package</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -199,7 +199,7 @@ dbl (11): Social_learning, Research_effort, ECV, Group_size, Gestation, Wean...
  - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
 </div>
 </div>
-<p>To generate a five-number summary, mean, and standard deviation (SD) for each quantitative variable, I loaded in the package {skimr} to use the <code>skim()</code>. <code>skim()</code> provides a nice overview (as a tibble), which shows the mean, SD, percentile values, and histograms of the distribution.</p>
+<p>To generate the five-number summary, mean, and standard deviation (SD) for each quantitative variable, I loaded in the package {skimr} to use the <code>skim()</code> function. <code>skim()</code> provides a nice overview of the dataset as a tibble, showcasing the mean, SD, percentile values, and histograms of the distributions. For the five number summary, the median is represented by “p50”, the minimum is p0, the maximum is p100, and the 1st and 3rd quartile values are represented as p25 and p75, respectively.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr) <span class="co"># loading in another package</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -476,7 +476,7 @@ dbl (11): Social_learning, Research_effort, ECV, Group_size, Gestation, Wean...
 <section id="step-2" class="level2">
 <h2 class="anchored" data-anchor-id="step-2">Step 2:</h2>
 <p><em>Plot brain size (ECV) as a function of social group size (Group_size), longevity (Longevity), juvenile period length (Weaning), and reproductive lifespan (Repro_lifespan).</em></p>
-<p>To plot ECV as a function of social group size, longevity, juvenile period length, and reproductive lifespan, I used <code>ggplot()</code> and <code>geom_point()</code> to get a bivariate scatterplot. Each variable was log-transformed to make the data more interpretable and remove the skew that was present in the non-transformed data; it is also necessary to do to meet the assumptions of a regression analysis. <code>na.rm()</code> was also used to remove any missing data just in case!</p>
+<p>To plot ECV as a function of social group size, longevity, juvenile period length, and reproductive lifespan, I used <code>ggplot()</code> and <code>geom_point()</code> to generate bivariate scatterplots. Each variable was log-transformed to make the data more interpretable, stabilize variance, and reduce the skew that was present in the non-transformed data. These transformations are necessary to do to meet the assumptions of a regression analysis. <code>na.rm()</code> was also used to remove any missing data just in case!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting ECV vs. social group size (both log-transformed)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> d, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(Group_size), <span class="at">y =</span> <span class="fu">log</span>(ECV))) <span class="sc">+</span></span>
@@ -523,61 +523,35 @@ dbl (11): Social_learning, Research_effort, ECV, Group_size, Gestation, Wean...
 <section id="step-3" class="level2">
 <h2 class="anchored" data-anchor-id="step-3">Step 3:</h2>
 <p><em>Derive by hand the ordinary least squares regression coefficients (beta1 and beta0) for ECV as a function of social group size.</em></p>
-<p>To calculate the ordinary least squares regression coefficients, I started out by filtering out rows that may be missing values for one of the variables using the pipe operator and conditions statements. The conditional statement ensures that we are filtering rows that do not, not have missing values (by !is.na) for the variables of interest. The output was assigned to a temporary dataset, “temp_d.”</p>
-<p>I was honestly not 100% on whether to perform the next steps with the log-transformed or raw data. <strong>To me, it makes sense to continue with the log-transformed data so the OLS assumptions aren’t violated and for consistency with the previous step.</strong> However, I added both calculations for the raw and log-transformed data just in case.</p>
-<p>To calculate beta1, I used the built-in covariance function and divided the covariance of ECV and group size by the variance of the predictor (x) variable, group size; this value was assigned to the object “beta_1.” I also did another method that breaks down the covariance and variance equations; this was assigned to “beta1_a.” This value ultimately describes the relationship between group size and ECV.</p>
-<p>To calculate beta0, I subtracted the product of beta1 and the mean of the predictor variable (group size) from the mean of the response variable (ECV), based on the beta0 equation. This is the value of y (ECV) when x (group size) is 0 (i.e., the y-intercept).</p>
+<p>To calculate the ordinary least squares (OLS) regression coefficients, I started out by filtering out rows that may be missing values for one of the variables using the pipe operator and conditional statements. The conditional statement ensures that we are filtering rows that do not have missing values (by !is.na) for the variables of interest. The output was assigned to a temporary dataset, “temp_d.”</p>
+<p>Since it was determined that log-transformations were necessary for the variables of interest, the next steps were performed on the log-transformed data to ensure OLS assumptions weren’t violated and for consistency.</p>
+<p>To calculate beta1, I used the built-in covariance function and divided the covariance of ECV and group size by the variance of the predictor variable (x), which is group size; this value was assigned to the object “log_beta_1.” I also did another method that breaks down the covariance and variance equations; this was assigned to “log_beta1_a.” This value ultimately describes the relationship between group size and ECV.</p>
+<p>To calculate beta0, I subtracted the product of beta1 and the mean of the predictor variable from the mean of the response variable (ECV), based on the beta0 equation. This is the value of y (ECV) when x (group size) is 0 (i.e., the y-intercept).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating OLS regression coefficients for raw data</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating OLS regression coefficients for log-transformed data</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># removing rows and assigning to temporary dataset</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>temp_d <span class="ot">&lt;-</span> d <span class="sc">|&gt;</span> </span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Group_size) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(ECV)) </span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating beta1 by hand</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>beta1 <span class="ot">&lt;-</span> (<span class="fu">cov</span>(temp_d<span class="sc">$</span>ECV, temp_d<span class="sc">$</span>Group_size))<span class="sc">/</span>(<span class="fu">var</span>(temp_d<span class="sc">$</span>Group_size))</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>beta1 <span class="co"># calling object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating beta1 by hand</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>log_beta1 <span class="ot">&lt;-</span> (<span class="fu">cov</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV), <span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))<span class="sc">/</span>(<span class="fu">var</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>log_beta1 <span class="co"># calling object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.463071</code></pre>
+<pre><code>[1] 0.7078342</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># an alternate way</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>beta1_a <span class="ot">&lt;-</span> <span class="fu">sum</span>((temp_d<span class="sc">$</span>ECV <span class="sc">-</span> <span class="fu">mean</span>(temp_d<span class="sc">$</span>ECV)) <span class="sc">*</span> (temp_d<span class="sc">$</span>Group_size <span class="sc">-</span> <span class="fu">mean</span>(temp_d<span class="sc">$</span>Group_size)))<span class="sc">/</span><span class="fu">sum</span>((temp_d<span class="sc">$</span>Group_size <span class="sc">-</span> <span class="fu">mean</span>(temp_d<span class="sc">$</span>Group_size))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>log_beta1_a <span class="ot">&lt;-</span> <span class="fu">sum</span>((<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV))) <span class="sc">*</span> (<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))))<span class="sc">/</span><span class="fu">sum</span>((<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))<span class="sc">^</span><span class="dv">2</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>beta1_a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>log_beta1_a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.463071</code></pre>
+<pre><code>[1] 0.7078342</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating beta0 by hand</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>beta0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(temp_d<span class="sc">$</span>ECV) <span class="sc">-</span> beta1 <span class="sc">*</span> <span class="fu">mean</span>(temp_d<span class="sc">$</span>Group_size)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>log_beta0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV)) <span class="sc">-</span> log_beta1 <span class="sc">*</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>beta0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 30.35652</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating OLS regression coefficients for log-transformed data</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating beta1 by hand</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>log_beta1 <span class="ot">&lt;-</span> (<span class="fu">cov</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV), <span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))<span class="sc">/</span>(<span class="fu">var</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>log_beta1 <span class="co"># calling object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.7078342</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># an alternate way</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>log_beta1_a <span class="ot">&lt;-</span> <span class="fu">sum</span>((<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV))) <span class="sc">*</span> (<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))))<span class="sc">/</span><span class="fu">sum</span>((<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size) <span class="sc">-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size)))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>log_beta1_a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.7078342</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating beta0 by hand</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>log_beta0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>ECV)) <span class="sc">-</span> log_beta1 <span class="sc">*</span> <span class="fu">mean</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>log_beta0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>log_beta0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2.145548</code></pre>
 </div>
@@ -586,35 +560,12 @@ dbl (11): Social_learning, Research_effort, ECV, Group_size, Gestation, Wean...
 <section id="step-4" class="level2">
 <h2 class="anchored" data-anchor-id="step-4">Step 4:</h2>
 <p><em>Confirm that you get the same results using the lm() function.</em></p>
-<p>To confirm I got the same results as the by-hand derivations of the OLS regression coefficients, <code>lm()</code> was used and the results were visualized using <code>summary()</code>. I checked the results for both the raw and log-transformed data.</p>
-<p>For both of them, the values were the same!</p>
+<p>To confirm I got the same results as the by-hand derivations of the OLS regression coefficients, <code>lm()</code> was used and the results were visualized using <code>summary()</code> for the log-transformed data.</p>
+<p>For both of them, the values were the same! The results were extracted using the “$” operator.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># checking with lm() function (raw data)</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(ECV <span class="sc">~</span> Group_size, <span class="at">data =</span> temp_d)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m) <span class="co"># visual overview of statistical results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = ECV ~ Group_size, data = temp_d)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--92.05 -29.25 -15.14  13.07 445.28 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)  30.3565     6.7963   4.467 1.56e-05 ***
-Group_size    2.4631     0.3508   7.021 7.26e-11 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 60.31 on 149 degrees of freedom
-Multiple R-squared:  0.2486,    Adjusted R-squared:  0.2436 
-F-statistic:  49.3 on 1 and 149 DF,  p-value: 7.259e-11</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># checking with lm() function (log-transformed data)</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>log_m <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> temp_d)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(log_m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># checking with lm() function (log-transformed data)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>log_m <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> temp_d)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(log_m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -635,8 +586,8 @@ Residual standard error: 0.9005 on 149 degrees of freedom
 Multiple R-squared:  0.4768,    Adjusted R-squared:  0.4733 
 F-statistic: 135.8 on 1 and 149 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting results</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>log_m<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting results</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>log_m<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    (Intercept) log(Group_size) 
       2.1455483       0.7078342 </code></pre>
@@ -646,52 +597,52 @@ F-statistic: 135.8 on 1 and 149 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="step-5" class="level2">
 <h2 class="anchored" data-anchor-id="step-5">Step 5:</h2>
 <p><em>Repeat the analysis above for three different major radiations of primates - “catarrhines”, “platyrrhines”, and “strepsirhines”) separately.</em></p>
-<p>In order the repeat the analysis for the three major radiations of primates, I filtered the temporary dataset (temp_d) further to generate the regression coefficients for each group separately using <code>lm()</code>. This time, I used the log-transformed data only to reduce the amount of code.</p>
-<p>I then performed the regression analysis using the <code>lm()</code> function for each filtered dataset to generate the regression coefficients. To compare the coefficients, I simply used the “$” operator on the linear modeling objects (“m_[abbreviated name]”) for the coeffcients.</p>
+<p>In order the repeat the analysis for the three major radiations of primates, I filtered the temporary dataset (temp_d) further to generate the regression coefficients for each group separately with <code>filter()</code> with the log-transformed data.</p>
+<p>Afterm I performed the regression analysis using the <code>lm()</code> function for each filtered dataset to generate the regression coefficients. To compare the coefficients, I simply used the “$” operator on the three linear models (designated as “m_[abbreviated name]”) to get the coefficients.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for catarrhines</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Catarrhini"</span>) <span class="co"># filtering by taxonomic group</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>m_cat <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> cat) <span class="co"># regression analysis on log-transformed data</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for platyrrhines</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>platy <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Platyrrhini"</span>)</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>m_platy <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> platy)</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for strepsirhines</span></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>streps <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Strepsirhini"</span>)</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>m_streps <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> streps)</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co"># comparison between regression coefficients</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>m_cat<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for catarrhines</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Catarrhini"</span>) <span class="co"># filtering by taxonomic group</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>m_cat <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> cat) <span class="co"># regression analysis on log-transformed data</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for platyrrhines</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>platy <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Platyrrhini"</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>m_platy <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> platy)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># analysis for strepsirhines</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>streps <span class="ot">&lt;-</span> temp_d <span class="sc">|&gt;</span> <span class="fu">filter</span>(Taxonomic_group <span class="sc">==</span> <span class="st">"Strepsirhini"</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>m_streps <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> streps)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co"># comparison between regression coefficients</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>m_cat<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    (Intercept) log(Group_size) 
     4.556382708    -0.007745779 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>m_platy<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>m_platy<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    (Intercept) log(Group_size) 
       1.4766688       0.8039719 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>m_streps<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>m_streps<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    (Intercept) log(Group_size) 
       1.8013668       0.6282129 </code></pre>
 </div>
 </div>
-<p><em>Do your regression coefficients differ among groups? How might you determine this?</em> Response: The regression coefficients of Platyrrhini and Strepsirhini are quite similar. They both show similar positive relationships between group and brain sizes. However, they ar notably differ from Catarrhini. Catarrhini shows a higher intercept but a slightly negative slope, suggesting group size as a poor predictor of ECV.</p>
-<p>To determine whether the regression coefficients differ between the groups, I would calculate the standard error for each slope and generate their 95% confidence intervals. If the confidence intervals do not overlap, it would support that the taxonomic groups are significantly different between this relationship.</p>
+<p><em>Do your regression coefficients differ among groups? How might you determine this?</em> Response: The regression coefficients of Platyrrhini and Strepsirhini are quite similar. They both show similar positive relationships between group and brain sizes (based on the slope values). However, they notably differ from Catarrhini; Catarrhini shows a higher intercept but a slightly negative slope, suggesting group size as a poor predictor of ECV.</p>
+<p>To determine whether the regression coefficients differ between the groups, I would calculate the standard error for each slope and generate their 95% confidence intervals. If the confidence intervals do not overlap, it would support that the taxonomic groups are significantly different in this relationship of interest.</p>
 </section>
 <section id="step-6" class="level2">
 <h2 class="anchored" data-anchor-id="step-6">Step 6:</h2>
 <p><em>For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, the 95% CI, and the p value associated with this coefficient by hand. Also extract this same information from the results of running the lm() function.</em></p>
-<p>To calculate the the SEs for the slope coefficient, I start of by calculating the sum of squares of y (SSY), which measures the total variation in the y variable, ECV. Throughout this analysis, I used indices ([[1]] for the response variable, and [[2]] for the predictor variable) according to the log-transformed data structure (log_m$model) for simplicity.</p>
-<p>Then, I calculate the regression sum of squares (SSR), which looks at the explained variation and determines how well the model represents the data. The SSE (error sum of squares) was then calculated to determine the unexplained variation in the data. Next, the mean squared error (MSE) was calculated to get the average unexplained variance, which takes the SSE and divides it by the degrees of freedom (n-2. The sum of square of x (SSX) was calculated afterwardm which measures the total variation in the x variable, social group size. SSX is the sum of the squared differences between the species’ group size and the average group size for that radiation.</p>
+<p>To calculate the the SEs for the slope coefficients, I first calculated the sum of squares of y (SSY), which measures the total variation in the y variable, ECV. Throughout this analysis, I used indices ([[1]] for the response variable, and [[2]] for the predictor variable) according to the log-transformed data structure (log_m$model) for simplicity.</p>
+<p>Then, I calculated the regression sum of squares (SSR), which looks at the explained variation and determines how well the model represents the data. The SSE (error sum of squares) was then determined to look at the unexplained variation in the data. Next, the mean squared error (MSE) was calculated to get the average unexplained variance, which takes the SSE and divides it by the degrees of freedom (n-2, in this case because we are estimating the slope and y-intercept). The sum of square of x (SSX) was calculated afterward, measuring the total variation in the x variable, social group size. SSX equals the sum of the squared differences between the species’ group size and the average group size for that radiation.</p>
 <p>Finally, I calculated the slope coefficient by taking the square root of MSE divided by SSX.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># linear model of interest</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>log_m <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> temp_d)</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>log_m <span class="co"># calling results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># linear model of interest</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>log_m <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> temp_d)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>log_m <span class="co"># calling results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -701,99 +652,99 @@ Coefficients:
     (Intercept)  log(Group_size)  
          2.1455           0.7078  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSY</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>SSY <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>model[[<span class="dv">1</span>]] <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">1</span>]]))<span class="sc">^</span><span class="dv">2</span>) <span class="co"># variation in y</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>SSY</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSY</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>SSY <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>model[[<span class="dv">1</span>]] <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">1</span>]]))<span class="sc">^</span><span class="dv">2</span>) <span class="co"># variation in y</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>SSY</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 230.9261</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSR</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>SSR <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>fitted.values <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">1</span>]]))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>SSR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSR</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>SSR <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>fitted.values <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">1</span>]]))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>SSR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 110.0974</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSE</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>(log_m<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>SSE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSE</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>(log_m<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>SSE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 120.8287</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating MSE</span></span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(log_m<span class="sc">$</span>model) <span class="co"># number of observations</span></span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>df_error <span class="ot">&lt;-</span> n <span class="sc">-</span> <span class="dv">2</span> <span class="co"># because we are estimating two parameters (beta1 and beta0)</span></span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>MSE <span class="ot">&lt;-</span> SSE<span class="sc">/</span>df_error <span class="co"># mean remaining variance</span></span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>MSE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating MSE</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(log_m<span class="sc">$</span>model) <span class="co"># number of observations</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>df_error <span class="ot">&lt;-</span> n <span class="sc">-</span> <span class="dv">2</span> <span class="co"># because we are estimating two parameters (beta1 and beta0)</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>MSE <span class="ot">&lt;-</span> SSE<span class="sc">/</span>df_error <span class="co"># mean remaining variance</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>MSE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.810931</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSX</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>SSX <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>model[[<span class="dv">2</span>]] <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">2</span>]]))<span class="sc">^</span><span class="dv">2</span>) <span class="co"># variation in x</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>SSX</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating SSX</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>SSX <span class="ot">&lt;-</span> <span class="fu">sum</span>((log_m<span class="sc">$</span>model[[<span class="dv">2</span>]] <span class="sc">-</span> <span class="fu">mean</span>(log_m<span class="sc">$</span>model[[<span class="dv">2</span>]]))<span class="sc">^</span><span class="dv">2</span>) <span class="co"># variation in x</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>SSX</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 219.7424</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating the slope coefficient</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>SE_beta1 <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(MSE<span class="sc">/</span>SSX)</span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>SE_beta1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating the slope coefficient</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>SE_beta1 <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(MSE<span class="sc">/</span>SSX)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>SE_beta1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.06074842</code></pre>
 </div>
 </div>
-<p>I calculated the 95% confidence intervals (CIs) by first assigning the critical value with the <code>qt()</code> function, with df determined by <code>df.residual()</code>; this function takes the number of observations (n) and subtracts the number of parameters estimated (p)–in this case, 2 parameters. 0.975 was used to generate a 95% confidence interval (where 0.975 leaves 2.5% in the tails). I then calculated the lower and upper bounds of the CI using the log-transformed beta1 value, critical value, and the SE of the slope coefficient.</p>
+<p>I calculated the 95% confidence intervals (CIs) by first assigning the critical value with the <code>qt()</code> function, with df determined by <code>df.residual()</code>; this function takes the number of observations (n) and subtracts the number of parameters estimated (p)–in this case, 2 parameters (this could have also been used in the previous step for calculating the MSE). 0.975 was used to generate a 95% confidence interval (where 0.975 leaves 2.5% in the tails). I then calculated the lower and upper bounds of the CI using the log-transformed beta1 value, critical value, and the SE of the slope coefficient.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating 95% confidence interval</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># assigning df using df.residual()</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating critical t-value</span></span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>crit_t <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> df) </span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>crit_t</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating 95% confidence interval</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># assigning df using df.residual()</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating critical t-value</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>crit_t <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> df) </span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>crit_t <span class="co"># calling object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.976013</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating CI bounds</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>ci_lower <span class="ot">&lt;-</span> log_beta1 <span class="sc">-</span> (crit_t <span class="sc">*</span> SE_beta1) <span class="co"># lower bound</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>ci_lower</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating CI bounds</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>ci_lower <span class="ot">&lt;-</span> log_beta1 <span class="sc">-</span> (crit_t <span class="sc">*</span> SE_beta1) <span class="co"># lower bound</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>ci_lower</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5877945</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>ci_upper <span class="ot">&lt;-</span> log_beta1 <span class="sc">+</span> (crit_t <span class="sc">*</span> SE_beta1) <span class="co"># upper bound</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>ci_upper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ci_upper <span class="ot">&lt;-</span> log_beta1 <span class="sc">+</span> (crit_t <span class="sc">*</span> SE_beta1) <span class="co"># upper bound</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>ci_upper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.8278739</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># results</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(ci_lower, ci_upper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># results</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(ci_lower, ci_upper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5877945 0.8278739</code></pre>
 </div>
 </div>
-<p>To calculate the p-value, I determined the t-statistic, which is the slope coefficient divided by the SE of the slope coefficient. The <code>pt()</code> function was then used to find the area in the lower tail that correspond to the absolute value of the t-statistic. This was multiple by two to account for both tails. This ultimately represents the probability of obtaining an extreme coefficient as the one observed, asumming social group size has no effect on ECV.</p>
+<p>To calculate the p-value, I determined the t-statistic, which is the slope coefficient divided by the SE of the slope coefficient. The <code>pt()</code> function was then used to find the area in the lower tail that corresponds to the absolute value of the t-statistic; this value was multipled by two to account for both tails. This ultimately represents the probability of obtaining an extreme coefficient as the one observed, assuming social group size has no effect on ECV.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating t-statistic</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>t_stat <span class="ot">&lt;-</span> (log_beta1)<span class="sc">/</span>(SE_beta1)</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>t_stat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating t-statistic</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>t_stat <span class="ot">&lt;-</span> (log_beta1)<span class="sc">/</span>(SE_beta1)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>t_stat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 11.65189</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating p-value</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>p_value_manual <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_stat), <span class="at">df =</span> df)</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>p_value_manual</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating p-value</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>p_value_manual <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_stat), <span class="at">df =</span> df) <span class="co"># df object from previous step (CIs)</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>p_value_manual</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.035862e-22</code></pre>
 </div>
 </div>
-<p>To confirm that the same results are obtained with the <code>lm()</code> function, I first loaded in the required {broom} package. I then used the <code>tidy()</code> function to make a clean, readable table of the key statistics of the linear model, “log_m.” The SE, 95% CI, and p-values were extracted from the tidy data frame for comparison to the values calculated by hand. I used “[]” extraction to easily extract data pertaining to the slope (beta1), which is of interest; the values are in the second row, which is why I used “[2].”</p>
+<p>To confirm that the same results are obtained with the <code>lm()</code> function, I first loaded in the required {broom} package. I used the <code>tidy()</code> function to make a clean, readable table of the key statistics of the linear model, “log_m.” The SE, 95% CI, and p-values were extracted from the tidy data frame for comparison to the values calculated by hand. I used “[]” extractions to easily extract data pertaining to the slope (beta1), which is of interest; the values are in the second row, which is why I used “[2].”</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># loading in package for tidy()</span></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a><span class="co"># checking with lm() function (log-transformed data)</span></span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="co"># creating tidy summary for linear model</span></span>
-<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>)</span>
-<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>s</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># loading in package for tidy()</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="co"># checking with lm() function (log-transformed data)</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="co"># creating tidy summary for linear model</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>s</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 7
   term            estimate std.error statistic  p.value conf.low conf.high
@@ -801,26 +752,26 @@ Coefficients:
 1 (Intercept)        2.15     0.142       15.1 6.26e-32    1.87      2.43 
 2 log(Group_size)    0.708    0.0607      11.7 1.04e-22    0.588     0.828</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting SE</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>se_tidy <span class="ot">&lt;-</span> s<span class="sc">$</span>std.error[<span class="dv">2</span>]</span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>se_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting SE</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>se_tidy <span class="ot">&lt;-</span> s<span class="sc">$</span>std.error[<span class="dv">2</span>]</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>se_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.06074842</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting 95% CI</span></span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>ci_tidy_lower <span class="ot">&lt;-</span> s<span class="sc">$</span>conf.low[<span class="dv">2</span>]</span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>ci_tidy_lower</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting 95% CI</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>ci_tidy_lower <span class="ot">&lt;-</span> s<span class="sc">$</span>conf.low[<span class="dv">2</span>]</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>ci_tidy_lower</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5877945</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>ci_tidy_upper<span class="ot">&lt;-</span> s<span class="sc">$</span>conf.high[<span class="dv">2</span>]</span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>ci_tidy_upper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>ci_tidy_upper<span class="ot">&lt;-</span> s<span class="sc">$</span>conf.high[<span class="dv">2</span>]</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>ci_tidy_upper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.8278739</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting p-value</span></span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>p_value_tidy <span class="ot">&lt;-</span> s<span class="sc">$</span>p.value[<span class="dv">2</span>]</span>
-<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>p_value_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting p-value</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>p_value_tidy <span class="ot">&lt;-</span> s<span class="sc">$</span>p.value[<span class="dv">2</span>]</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>p_value_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.035862e-22</code></pre>
 </div>
@@ -830,131 +781,131 @@ Coefficients:
 <h2 class="anchored" data-anchor-id="step-7">Step 7:</h2>
 <p><em>Use a permutation approach with 1000 permutations to generate a null sampling distribution for the slope coefficient. What is it that you need to permute? What is the p value associated with your original slope coefficient? You can use either the quantile method or a theory-based method sampling distribution as the estimate of the standard error, or both, to calculate this p value.</em></p>
 <p>For our current linear model, I need to permute the predictor variable, social group size, while keeping the response variable, ECV, the same.</p>
-<p>To begin the permutation approach, I first generate an object called “observed_coef,” which pulls out the specific slope coefficient from the tidy table to represent the actual slope. The permutation appraoch is then set up by defining the number of permutations (1000) and creating an empty vector that will contain the 1000 different slope coefficients generated from this simulation. A permutation for loop is created, where a temporary copy of the dataset is made for each round, the social group sizes are shuffled (by <code>sample()</code>) (while ECV remains the same), and a new linear regression analysis is performed on the shuffled data for every loop iteration.</p>
-<p>Lastly, I visualize the null distribution using a histogram. This allows me to see how far away the observed coefficient–0.708–sits from the null sampling distribution. Since it is far away from the center, it supports that we have statistically determined that the relationship between ECV and social group size may not be due to chance.</p>
+<p>To begin the permutation approach, I first generated an object called “observed_coef,” which pulls out the specific slope coefficient from the tidy table to represent the actual slope. The permutation approach was set up by defining the number of permutations (1000) and creating an empty vector that will contain the 1000 different slope coefficients generated from this simulation. A permutation for loop is then created, where a temporary copy of the dataset is made for each round, the social group sizes are shuffled (by <code>sample()</code>) (while ECV remains the same), and a new linear regression analysis is performed on the shuffled data for each loop iteration.</p>
+<p>Lastly, I visualized the null distribution using a histogram (we expect a normal distribution with the center around 0). This allows me to see how far away the observed coefficient sits from the null sampling distribution. Since it is far away from the center, it supports that we have statistically determined that the relationship between ECV and social group size may not be due to chance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting the observed slope coefficient</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>observed_coef <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m) <span class="sc">|&gt;</span> <span class="co"># creating a tidy table</span></span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> <span class="co"># filtering group size</span></span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(estimate) <span class="co"># pulling result</span></span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>observed_coef</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting the observed slope coefficient</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>observed_coef <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m) <span class="sc">|&gt;</span> <span class="co"># creating a tidy table</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> <span class="co"># filtering group size</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(estimate) <span class="co"># pulling result</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>observed_coef</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.7078342</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setting up permutation loop</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>nperm <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="co"># number of permutations</span></span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>perm_coefs <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">length =</span> nperm) <span class="co"># creating a vector of results</span></span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nperm) {</span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>    d_perm <span class="ot">&lt;-</span> temp_d <span class="co"># creating a copy of data frame to shuffle values</span></span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>    d_perm<span class="sc">$</span>log_group <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))  <span class="co"># shuffling predictor values</span></span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># running model on shuffled data and pulling the slope</span></span>
-<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>    perm_coefs[[i]] <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> log_group, <span class="at">data =</span> d_perm) <span class="sc">|&gt;</span> </span>
-<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log_group"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pull</span>(estimate)</span>
-<span id="cb78-14"><a href="#cb78-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb78-15"><a href="#cb78-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-16"><a href="#cb78-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualizing distribution</span></span>
-<span id="cb78-17"><a href="#cb78-17" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(perm_coefs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setting up permutation loop</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>nperm <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="co"># number of permutations</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>perm_coefs <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">length =</span> nperm) <span class="co"># creating a vector of results</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nperm) {</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>    d_perm <span class="ot">&lt;-</span> temp_d <span class="co"># creating a copy of data frame to shuffle values</span></span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>    d_perm<span class="sc">$</span>log_group <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">log</span>(temp_d<span class="sc">$</span>Group_size))  <span class="co"># shuffling predictor values</span></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># running model on shuffled data and pulling the slope</span></span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>    perm_coefs[[i]] <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> log_group, <span class="at">data =</span> d_perm) <span class="sc">|&gt;</span> </span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log_group"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pull</span>(estimate)</span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb70-15"><a href="#cb70-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-16"><a href="#cb70-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualizing distribution</span></span>
+<span id="cb70-17"><a href="#cb70-17" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(perm_coefs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="exercise-08_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="exercise-08_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>To calculate the p-value associated with the original slope coefficeint, I calculated the value using the quantile and theory-based methods. For the quantile method, I created a vector of TRUE and FALSE values and took the mean to get a proportion from the permutations. For the theory-based approach, I first determined the standard deviation of the sample distribution to get the SE. I then calculated a t-statistic based on the permuted SE and calculated the p-value similar to the previous step.</p>
-<p>Based on the quantile method, I got a p-value of 0, indicating that none of the 1000 permutations produced a slope as extreme as the observed coefficient. The theory-based method, which uses the permutation distribution to parameterize a t-distribution, resulted a very small p-value (e-15).</p>
+<p>To calculate the p-value associated with the original slope coefficient, I calculated the value using the quantile and theory-based methods. For the quantile method, I created a vector of TRUE and FALSE values and took the mean to get a proportion from the permutations. For the theory-based approach, I first determined the standard deviation of the sampling distribution to get the SE. I then calculated a t-statistic based on the permuted SE and calculated the p-value similar to the previous step.</p>
+<p>Based on the quantile method, I got a p-value of 0, indicating that none of the 1000 permutations produced a slope as extreme as the observed coefficient. The theory-based method, which uses the permutation distribution to parameterize a t-distribution, which results a very small p-value.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating quantile-based p-value</span></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>p_value_quantile <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">abs</span>(perm_coefs) <span class="sc">&gt;=</span> <span class="fu">abs</span>(observed_coef))</span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Quantile-based p-value:"</span>, p_value_quantile) <span class="co"># showing results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating quantile-based p-value</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>p_value_quantile <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">abs</span>(perm_coefs) <span class="sc">&gt;=</span> <span class="fu">abs</span>(observed_coef))</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Quantile-based p-value:"</span>, p_value_quantile) <span class="co"># showing results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Quantile-based p-value: 0</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating theory-based p-value</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="co"># estimating SE from the permutation distribution </span></span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>se_perm <span class="ot">&lt;-</span> <span class="fu">sd</span>(perm_coefs)</span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating t-statistic using this new SE</span></span>
-<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>t_stat_theory <span class="ot">&lt;-</span> (observed_coef)<span class="sc">/</span>(se_perm)</span>
-<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating p-value using  t-distribution</span></span>
-<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># using df.residual() to get the correct degrees of freedom</span></span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>p_value_theory <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_stat_theory), <span class="at">df =</span> df) <span class="co"># calculating p-value</span></span>
-<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Theory-based p-value:"</span>, p_value_theory)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating theory-based p-value</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="co"># estimating SE from the permutation distribution </span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>se_perm <span class="ot">&lt;-</span> <span class="fu">sd</span>(perm_coefs)</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating t-statistic using this new SE</span></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>t_stat_theory <span class="ot">&lt;-</span> (observed_coef)<span class="sc">/</span>(se_perm)</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating p-value using  t-distribution</span></span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># using df.residual() to get the correct degrees of freedom</span></span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>p_value_theory <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_stat_theory), <span class="at">df =</span> df) <span class="co"># calculating p-value</span></span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Theory-based p-value:"</span>, p_value_theory)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Theory-based p-value: 4.129089e-14</code></pre>
+<pre><code>Theory-based p-value: 1.11724e-13</code></pre>
 </div>
 </div>
 </section>
 <section id="step-8" class="level2">
 <h2 class="anchored" data-anchor-id="step-8">Step 8:</h2>
 <p><em>Use bootstrapping to generate a 95% CI for your estimate of the slope coefficient using both the quantile method and the theory-based method.</em></p>
-<p>To generate a 95% CI using bootstrapping, I first defined the number of samples to be 1000 and generated a empty vector to store the results from the loop. A for loop for bootstrapping was made to resample the data with replacement. For each of the resamples, a regression was run and the slope was pulled and stored into the vector that was made (boot_coef).</p>
-<p>Then, I visualized the distribution using the <code>hist()</code> function, which should be centered near the observed slope if the original results was stable. <code>quantile()</code> was used to determine an empirical confidence interval, cutting off the top and bottom 2.5%, for the quantile method of determine the 95% CI.</p>
-<p>To determine the theory-based CI, I first calculated the empirical estimate of the SE, which is the standard deviation of the 1000 bootstrap replicates The observed slope from the original model was then pulled, the degrees of freedom were determined, and the critical value was estimated for a 95% CI. Lastly, the upper and lower CI bounds were calculated by multiplying the critical value by the SE and adding/subtracting from the observed slope.</p>
+<p>To generate a 95% CI using bootstrapping, I first defined the number of samples to be 1000 and generated an empty vector to store the results from the loop. A for loop for bootstrapping was made to resample the data with replacement. For each of the (re)samples, a regression was run and the slope was pulled and stored into the storage vector that was made (boot_coef).</p>
+<p>I visualized the distribution using the <code>hist()</code> function, which should be centered near the observed slope if the original results were stable. To estimate the 95% CI using the quantile method, <code>quantile()</code> was used to determine an empirical confidence interval, cutting off the top and bottom 2.5%.</p>
+<p>To determine the theory-based CI, I first calculated the empirical estimate of the SE, which is the standard deviation of the 1000 bootstrap replicates. The observed slope from the original model was then pulled, the degrees of freedom were determined, and the critical t-value was estimated for a 95% CI. Lastly, the upper and lower CI bounds were calculated by multiplying the critical value by the SE and adding/subtracting from the observed slope.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># estimating the CI using bootstrapping</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>nboot <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="co"># defining number of samples</span></span>
-<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>boot_coef <span class="ot">&lt;-</span> (<span class="at">vector =</span> nboot) <span class="co"># creating a vector to store results from loop</span></span>
-<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a><span class="co"># bootstrapping loop</span></span>
-<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nboot){ </span>
-<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>  d_boot <span class="ot">&lt;-</span> temp_d[<span class="fu">sample</span>(<span class="fu">nrow</span>(temp_d), <span class="at">replace =</span> <span class="cn">TRUE</span>), ]  <span class="co"># sampling rows with replacement</span></span>
-<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># running model on bootstrapped sample and pulling slope</span></span>
-<span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a>  boot_coef[[i]] <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> d_boot) <span class="sc">|&gt;</span> </span>
-<span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb83-12"><a href="#cb83-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb83-13"><a href="#cb83-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(estimate)</span>
-<span id="cb83-14"><a href="#cb83-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb83-15"><a href="#cb83-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-16"><a href="#cb83-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualizing distribution (should be centered on observed slope)</span></span>
-<span id="cb83-17"><a href="#cb83-17" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(boot_coef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># estimating the CI using bootstrapping</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>nboot <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="co"># defining number of samples</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>boot_coef <span class="ot">&lt;-</span> (<span class="at">vector =</span> nboot) <span class="co"># creating a vector to store results from loop</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a><span class="co"># bootstrapping loop</span></span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nboot){ </span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>  d_boot <span class="ot">&lt;-</span> temp_d[<span class="fu">sample</span>(<span class="fu">nrow</span>(temp_d), <span class="at">replace =</span> <span class="cn">TRUE</span>), ]  <span class="co"># sampling rows with replacement</span></span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># running model on bootstrapped sample and pulling slope</span></span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  boot_coef[[i]] <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(ECV) <span class="sc">~</span> <span class="fu">log</span>(Group_size), <span class="at">data =</span> d_boot) <span class="sc">|&gt;</span> </span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(estimate)</span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualizing distribution (should be centered on observed slope)</span></span>
+<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(boot_coef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="exercise-08_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="exercise-08_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating 95% CI using quantile function</span></span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>ci_quantile <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_coef, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)) </span>
-<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>ci_quantile</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating 95% CI using quantile function</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>ci_quantile <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_coef, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)) </span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>ci_quantile</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     2.5%     97.5% 
-0.5825196 0.8229956 </code></pre>
+0.5699844 0.8158450 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating theory-based 95% CI</span></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>boot_se <span class="ot">&lt;-</span> <span class="fu">sd</span>(boot_coef) <span class="co"># calculating SE</span></span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a><span class="co"># determining observed slope</span></span>
-<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>obs_slope <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m) <span class="sc">|&gt;</span> </span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(estimate)</span>
-<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating critical value</span></span>
-<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># defining df</span></span>
-<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>t_crit <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> df) </span>
-<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating low and upper bounds</span></span>
-<span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a>boot_low  <span class="ot">&lt;-</span> obs_slope <span class="sc">-</span> (t_crit <span class="sc">*</span> boot_se) <span class="co"># lower bound</span></span>
-<span id="cb86-15"><a href="#cb86-15" aria-hidden="true" tabindex="-1"></a>boot_high <span class="ot">&lt;-</span> obs_slope <span class="sc">+</span> (t_crit <span class="sc">*</span> boot_se) <span class="co"># upper bound</span></span>
-<span id="cb86-16"><a href="#cb86-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb86-17"><a href="#cb86-17" aria-hidden="true" tabindex="-1"></a><span class="co"># results</span></span>
-<span id="cb86-18"><a href="#cb86-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Theory-Based Bootstrap 95% CI: ["</span>, boot_low, <span class="st">","</span>, boot_high, <span class="st">"]</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating theory-based 95% CI</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>boot_se <span class="ot">&lt;-</span> <span class="fu">sd</span>(boot_coef) <span class="co"># calculating SE</span></span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a><span class="co"># determining observed slope</span></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>obs_slope <span class="ot">&lt;-</span> <span class="fu">tidy</span>(log_m) <span class="sc">|&gt;</span> </span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"log(Group_size)"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(estimate)</span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating critical value</span></span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(log_m) <span class="co"># defining df</span></span>
+<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>t_crit <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> df) </span>
+<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating low and upper bounds</span></span>
+<span id="cb78-14"><a href="#cb78-14" aria-hidden="true" tabindex="-1"></a>boot_low  <span class="ot">&lt;-</span> obs_slope <span class="sc">-</span> (t_crit <span class="sc">*</span> boot_se) <span class="co"># lower bound</span></span>
+<span id="cb78-15"><a href="#cb78-15" aria-hidden="true" tabindex="-1"></a>boot_high <span class="ot">&lt;-</span> obs_slope <span class="sc">+</span> (t_crit <span class="sc">*</span> boot_se) <span class="co"># upper bound</span></span>
+<span id="cb78-16"><a href="#cb78-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-17"><a href="#cb78-17" aria-hidden="true" tabindex="-1"></a><span class="co"># results</span></span>
+<span id="cb78-18"><a href="#cb78-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Theory-Based Bootstrap 95% CI: ["</span>, boot_low, <span class="st">","</span>, boot_high, <span class="st">"]</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Theory-Based Bootstrap 95% CI: [ 0.5875478 , 0.8281207 ]</code></pre>
+<pre><code>Theory-Based Bootstrap 95% CI: [ 0.5844123 , 0.8312562 ]</code></pre>
 </div>
 </div>
-<p><em>Do these CIs suggest that your slope coefficient is different from zero?</em> The quantile and theory-based confidence intervals suggest that the slope coefficient is significantly different from 0, as they both exclude 0. Since the range of the confidence intervals are positive, we can conclude with 95% confidence that the relationship between social group size and ECV is significantly different from 0, and we can reject the null hypothesis. If the CIs included 0, we would not be able to reject the null hypothesis and would suggest that the difference between the predictor and response variables are not significantly different.</p>
+<p><em>Do these CIs suggest that your slope coefficient is different from zero?</em> The quantile and theory-based confidence intervals suggest that the slope coefficient is significantly different from 0, as they both exclude 0. Since the range of the confidence intervals are positive, we can conclude with 95% confidence that the relationship between social group size and ECV is significantly different from 0, and we can reject the null hypothesis (where the null predicts no difference). If the CIs included 0, we would not be able to reject the null hypothesis and would suggest that the difference between the predictor and response variables are not significantly different and any difference may be due by chance.</p>
 </section>
 
 </main>
